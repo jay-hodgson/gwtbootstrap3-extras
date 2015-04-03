@@ -36,6 +36,10 @@ import com.google.gwt.user.client.ui.HasName;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.gwt.user.client.ui.Widget;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.gwtbootstrap3.client.shared.event.HideEvent;
 import org.gwtbootstrap3.client.shared.event.HideHandler;
 import org.gwtbootstrap3.client.shared.event.ShowEvent;
@@ -79,9 +83,23 @@ import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeYearH
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.OutOfRangeEvent;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.OutOfRangeHandler;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.gwt.core.client.ScriptInjector;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.editor.client.IsEditor;
+import com.google.gwt.editor.client.LeafValueEditor;
+import com.google.gwt.editor.client.adapters.TakesValueEditor;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.ui.HasEnabled;
+import com.google.gwt.user.client.ui.HasName;
+import com.google.gwt.user.client.ui.HasValue;
+import com.google.gwt.user.client.ui.HasVisibility;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author Joshua Godi
@@ -129,11 +147,35 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasId, Has
     private Widget container = null;
     private DateTimePickerLanguage language = DateTimePickerLanguage.EN;
     private DateTimePickerPosition position = DateTimePickerPosition.BOTTOM_RIGHT;
-
+    boolean isConfigured = false;
+    
     public DateTimePickerBase() {
         textBox = new TextBox();
         setElement((Element) textBox.getElement());
         setFormat(format);
+        /*
+         * Originally this widget made calls the pop-up javascript for every
+         * setValue() and onLoad() and onUnLoad(). This caused serious performance problems
+         * when more than a few of these widget were on the screen (see
+         * SWC-2003). To address this performance issue, configure() now called
+         * when focus is gained. The pop-up now discovers value changes when it
+         * shown rather than when the changes occur.
+         */
+        this.addDomHandler(new FocusHandler() {
+            @Override
+            public void onFocus(FocusEvent event) {
+                focusGained();
+            }
+        }, FocusEvent.getType());
+    }
+    
+    /**
+     * This is where the widget gets bound to the javascript.
+     */
+    private void focusGained(){
+        configure();
+        show();
+        isConfigured = true;
     }
 
     public void setContainer(final Widget container) {
@@ -235,20 +277,7 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasId, Has
     public DateTimePickerPosition getPosition() {
         return position;
     }
-
-    /**
-     * Call this whenever changing any settings: minView, startView, format, etc. If you are changing
-     * format and date value, the updates must take in such order:
-     * <p/>
-     * 1. DateTimePicker.reload()
-     * 2. DateTimePicker.setValue(newDate); // Date newDate.
-     * <p/>
-     * Otherwise date value is not updated.
-     */
-    public void reload() {
-        configure();
-    }
-
+    
     public void show() {
         show(getElement());
     }
@@ -264,9 +293,6 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasId, Has
 
     @Override
     public void onShow(final Event e) {
-        // On show we put focus on the textbox
-        textBox.setFocus(true);
-
         fireEvent(new ShowEvent(e));
     }
 
@@ -277,10 +303,7 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasId, Has
 
     @Override
     public void onHide(final Event e) {
-        // On hide we remove focus from the textbox
-        textBox.setFocus(false);
-
-        fireEvent(new HideEvent(e));
+        fireEvent(new HideEvent(e)); 
     }
 
     @Override
@@ -484,7 +507,7 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasId, Has
     @Override
     public void setValue(final Date value, final boolean fireEvents) {
         textBox.setValue(value != null ? dateTimeFormat.format(value) : null);
-        update(textBox.getElement());
+//        update(textBox.getElement());
 
         if (fireEvents) {
             ValueChangeEvent.fire(DateTimePickerBase.this, value);
@@ -505,18 +528,23 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasId, Has
     @Override
     protected void onLoad() {
         super.onLoad();
-        configure();
-
+     
         // With the new update (2.3.1), the parent must have position: relative for positioning to work
         if (getElement().getParentElement() != null) {
             getElement().getParentElement().getStyle().setPosition(Style.Position.RELATIVE);
-        }
+    }
     }
 
     @Override
     protected void onUnload() {
         super.onUnload();
-        remove(getElement());
+        /*
+         * The remove() method is very expensive (see SWC-2003), so we only want to call it for
+         * widget what were actually configured.
+         */
+        if(isConfigured){
+            remove(getElement()); 
+        }
     }
 
     protected void configure() {
