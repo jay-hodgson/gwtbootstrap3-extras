@@ -512,11 +512,12 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasId, Has
     @Override
     protected void onLoad() {
         super.onLoad();
-        configure();
-
+        
         // With the new update (2.3.1), the parent must have position: relative for positioning to work
         if (getElement().getParentElement() != null) {
             getElement().getParentElement().getStyle().setPosition(Style.Position.RELATIVE);
+            getElement().getParentElement().addClassName("hide-prev");
+            getElement().getParentElement().addClassName("hide-next");
         }
     }
 
