@@ -26,6 +26,8 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.editor.client.IsEditor;
 import com.google.gwt.editor.client.LeafValueEditor;
 import com.google.gwt.editor.client.adapters.TakesValueEditor;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -36,9 +38,6 @@ import com.google.gwt.user.client.ui.HasName;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.HasVisibility;
 import com.google.gwt.user.client.ui.Widget;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.gwtbootstrap3.client.shared.event.HideEvent;
 import org.gwtbootstrap3.client.shared.event.HideHandler;
@@ -83,23 +82,9 @@ import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeYearH
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.OutOfRangeEvent;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.OutOfRangeHandler;
 
-import com.google.gwt.core.client.ScriptInjector;
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.editor.client.IsEditor;
-import com.google.gwt.editor.client.LeafValueEditor;
-import com.google.gwt.editor.client.adapters.TakesValueEditor;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.FocusHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.ui.HasEnabled;
-import com.google.gwt.user.client.ui.HasName;
-import com.google.gwt.user.client.ui.HasValue;
-import com.google.gwt.user.client.ui.HasVisibility;
-import com.google.gwt.user.client.ui.Widget;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Joshua Godi
@@ -126,7 +111,7 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasId, Has
     private DateTimeFormat dateTimeFormat;
     private final DateTimeFormat startEndDateFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
     private LeafValueEditor<Date> editor;
-
+    boolean isConfigured = false;
     /**
      * DEFAULT values
      */
@@ -147,8 +132,7 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasId, Has
     private Widget container = null;
     private DateTimePickerLanguage language = DateTimePickerLanguage.EN;
     private DateTimePickerPosition position = DateTimePickerPosition.BOTTOM_RIGHT;
-    boolean isConfigured = false;
-    
+
     public DateTimePickerBase() {
         textBox = new TextBox();
         setElement((Element) textBox.getElement());
@@ -161,22 +145,23 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasId, Has
          * when focus is gained. The pop-up now discovers value changes when it
          * shown rather than when the changes occur.
          */
-        this.addDomHandler(new FocusHandler() {
-            @Override
-            public void onFocus(FocusEvent event) {
-                focusGained();
-            }
-        }, FocusEvent.getType());
-    }
-    
-    /**
+         this.addDomHandler(new FocusHandler() {
+	         @Override
+	         public void onFocus(FocusEvent event) {
+	        	 focusGained();
+	         }
+         }, FocusEvent.getType());
+	}
+
+     /**
      * This is where the widget gets bound to the javascript.
      */
-    private void focusGained(){
-        configure();
-        show();
-        isConfigured = true;
+     private void focusGained(){
+	     configure();
+	     show();
+	     isConfigured = true;
     }
+    
 
     public void setContainer(final Widget container) {
         this.container = container;
@@ -277,7 +262,7 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasId, Has
     public DateTimePickerPosition getPosition() {
         return position;
     }
-    
+
     public void show() {
         show(getElement());
     }
@@ -303,7 +288,7 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasId, Has
 
     @Override
     public void onHide(final Event e) {
-        fireEvent(new HideEvent(e)); 
+        fireEvent(new HideEvent(e));
     }
 
     @Override
@@ -507,8 +492,7 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasId, Has
     @Override
     public void setValue(final Date value, final boolean fireEvents) {
         textBox.setValue(value != null ? dateTimeFormat.format(value) : null);
-//        update(textBox.getElement());
-
+        
         if (fireEvents) {
             ValueChangeEvent.fire(DateTimePickerBase.this, value);
         }
@@ -528,22 +512,24 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasId, Has
     @Override
     protected void onLoad() {
         super.onLoad();
-     
+        configure();
+
         // With the new update (2.3.1), the parent must have position: relative for positioning to work
         if (getElement().getParentElement() != null) {
             getElement().getParentElement().getStyle().setPosition(Style.Position.RELATIVE);
-    }
+        }
     }
 
     @Override
     protected void onUnload() {
         super.onUnload();
+        
         /*
-         * The remove() method is very expensive (see SWC-2003), so we only want to call it for
-         * widget what were actually configured.
-         */
+        * The remove() method is very expensive (see SWC-2003), so we only want to call it for
+        * widget what were actually configured.
+        */
         if(isConfigured){
-            remove(getElement()); 
+        	remove(getElement());
         }
     }
 
