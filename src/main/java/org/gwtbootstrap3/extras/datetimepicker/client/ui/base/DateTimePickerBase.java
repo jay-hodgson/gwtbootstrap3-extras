@@ -646,7 +646,11 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasReadOnl
     @Override
     protected void onLoad() {
         super.onLoad();
-        configure();
+        
+        if (getElement().getParentElement() != null) {
+            getElement().getParentElement().addClassName("hide-prev");
+            getElement().getParentElement().addClassName("hide-next");
+        }
     }
 
     /** {@inheritDoc} */
