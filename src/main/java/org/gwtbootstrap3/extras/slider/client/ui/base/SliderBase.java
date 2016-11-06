@@ -78,7 +78,7 @@ public abstract class SliderBase<T> extends Widget implements
 
     private FormatterCallback<T> formatterCallback;
     private LeafValueEditor<T> editor;
-    private boolean sliderNamespaceAvailable = true;
+    private boolean sliderNamespaceAvailable = false;
 
     private final AttributeMixin<SliderBase<T>> attributeMixin = new AttributeMixin<SliderBase<T>>(this);
 
