@@ -856,4 +856,10 @@ public class DatePickerBase extends Widget implements HasEnabled, HasId, HasResp
         errorHandlerMixin.showErrors(errors);
     }
 
+    @Override
+    protected void onDetach() {
+        try{
+            super.onDetach();
+        } catch (Throwable t) {}
+    }
 }

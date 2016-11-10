@@ -971,4 +971,10 @@ public abstract class SliderBase<T> extends Widget implements
         return $wnd.jQuery(e).bootstrapSlider(@org.gwtbootstrap3.extras.slider.client.ui.base.SliderCommand::GET_ATTRIBUTE, attr);
     }-*/;
 
+    @Override
+    protected void onDetach() {
+        try{
+            super.onDetach();
+        } catch (Throwable t) {}
+    }
 }

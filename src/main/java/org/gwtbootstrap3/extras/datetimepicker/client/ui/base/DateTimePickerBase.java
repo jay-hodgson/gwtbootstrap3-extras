@@ -865,4 +865,10 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasReadOnl
         errorHandlerMixin.showErrors(errors);
     }
 
+    @Override
+    protected void onDetach() {
+        try{
+            super.onDetach();
+        } catch (Throwable t) {}
+    }
 }

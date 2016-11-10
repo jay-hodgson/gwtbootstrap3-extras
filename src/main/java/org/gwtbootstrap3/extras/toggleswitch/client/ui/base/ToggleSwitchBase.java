@@ -395,4 +395,10 @@ public class ToggleSwitchBase extends Widget implements HasSize<SizeType>, HasVa
     private native boolean switchState(Element e) /*-{
         return $wnd.jQuery(e).bootstrapSwitch('state');
     }-*/;
+    @Override
+    protected void onDetach() {
+        try{
+            super.onDetach();
+        } catch (Throwable t) {}
+    }
 }

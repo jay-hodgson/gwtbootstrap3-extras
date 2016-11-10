@@ -918,4 +918,11 @@ public abstract class SelectBase<T> extends ComplexWidget implements HasValue<T>
     protected native void command(Element e, String command) /*-{
         $wnd.jQuery(e).selectpicker(command);
     }-*/;
+
+    @Override
+    protected void onDetach() {
+        try{
+            super.onDetach();
+        } catch (Throwable t) {}
+    }
 }
