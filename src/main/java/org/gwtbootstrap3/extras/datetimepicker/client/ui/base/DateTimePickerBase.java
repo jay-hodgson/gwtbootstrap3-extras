@@ -635,7 +635,7 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasReadOnl
     public void setValue(final Date value, final boolean fireEvents) {
         errorHandlerMixin.clearErrors();
         textBox.setValue(value != null ? dateTimeFormat.format(value) : null);
-        update(textBox.getElement());
+        // update(textBox.getElement());
 
         if (fireEvents) {
             ValueChangeEvent.fire(DateTimePickerBase.this, value);
@@ -646,7 +646,7 @@ public class DateTimePickerBase extends Widget implements HasEnabled, HasReadOnl
     @Override
     protected void onLoad() {
         super.onLoad();
-        
+        configure();
         if (getElement().getParentElement() != null) {
             getElement().getParentElement().addClassName("hide-prev");
             getElement().getParentElement().addClassName("hide-next");
