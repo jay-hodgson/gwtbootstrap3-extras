@@ -37,6 +37,7 @@ class SelectOptions extends JavaScriptObject {
 
     // Select (<select data-xx="xx">) options
     static final String ACTIONS_BOX = DATA_PREFIX + "actions-box";
+    static final String CONTAINER = DATA_PREFIX + "container";
     static final String DESELECT_ALL_TEXT = DATA_PREFIX + "deselect-all-text";
     static final String DROPDOWN_ALIGN_RIGHT = DATA_PREFIX + "dropdown-align-right";
     static final String DROPUP_AUTO = DATA_PREFIX + "dropup-auto";
@@ -61,6 +62,7 @@ class SelectOptions extends JavaScriptObject {
     static final String STYLE = DATA_PREFIX + "style";
     static final String TITLE = DATA_PREFIX + "title";
     static final String WIDTH = DATA_PREFIX + "width";
+    static final String WINDOW_PADDING = DATA_PREFIX + "window-padding";
 
     // Option (<option data-xx="xx">) options
     static final String DIVIDER = DATA_PREFIX + "divider";
